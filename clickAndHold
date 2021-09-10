@@ -1,0 +1,67 @@
+import sys
+
+import pygame
+from pygame.locals import *
+
+pygame.init()
+
+fps = 60
+fpsClock = pygame.time.Clock()
+pygame.font.init()
+
+width, height = 640, 480
+screen = pygame.display.set_mode((width, height))
+
+myfont = pygame.font.SysFont('Comic Sans MS', 30)
+textsurface = myfont.render('This is a popup', False, (100, 100, 100))
+
+
+# -- create toggles --
+# Everything else is default prep
+#   here's the new stuff
+
+# Set up two variables
+holdMouseClick = False # You clicked the mouse and want to mimic holding the button down
+screenIsUp = False     # You can see the screen
+# -- end create toggles --
+
+
+# Game loop
+while True:
+    screen.fill((0, 0, 0))
+
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            pygame.quit()
+            sys.exit()
+
+    # -- use toggles --
+    #
+    # Okay, so now in the loop we want to use the toggles
+    #   First up is what to do when the mouse has been clicked
+
+    # If the mouse button actively being clicked
+    if pygame.mouse.get_pressed() == (1, 0, 0):
+        # And there isn't a screen up, i.e. you want to get the popup
+        if not screenIsUp:
+            holdMouseClick= True
+            screen.blit(textsurface, (100, 100))
+            #print("Popped Up!")
+
+        # If a screen is already up, we're clicking to remove it
+        if screenIsUp:
+            screenIsUp = False      # Set this to false, no more screen please
+            holdMouseClick = False  # Okay, release the mouse button please
+            print("Clear Popup")
+            pygame.time.wait(200)   # Humans are slower than computers, this helps
+
+    # If the mouse button is up but you already clicked to make a popup
+    if pygame.mouse.get_pressed() == (0,0,0) and holdMouseClick:
+        screen.blit(textsurface, (100, 100))
+        screenIsUp = True
+        print("Holding!")
+
+    # -- end use toggles --
+
+    pygame.display.flip()
+    fpsClock.tick(fps)
